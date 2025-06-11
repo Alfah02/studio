@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { PageTitle } from "@/components/custom/PageTitle";
 import { CallHistoryListItem } from "@/components/custom/CallHistoryListItem";
-import { dummyCallHistory } from "@/lib/data";
+// import { dummyCallHistory } from "@/lib/data"; // No longer importing dummy data
 import type { CallRecord } from '@/lib/types';
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal, ListX } from "lucide-react";
@@ -13,20 +13,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 
 export default function HistoryPage() {
-  const [history, setHistory] = useState<CallRecord[]>(dummyCallHistory);
+  const [history, setHistory] = useState<CallRecord[]>([]); // Initialize with empty array
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'audio' | 'video'>('all');
   const [filterOutcome, setFilterOutcome] = useState<'all' | 'answered' | 'missed' | 'outgoing'>('all');
   const { toast } = useToast();
+
+  // In a real application, you would fetch call history from a backend or SipContext
+  // useEffect(() => {
+  //   // Example: fetchHistory().then(data => setHistory(data));
+  // }, []);
 
   const handleCall = (record: CallRecord) => {
     toast({
       title: `Appel de ${record.contactName}...`,
       description: `Composition du ${record.contactNumber} via appel ${record.type}.`,
     });
+    // Implement actual call logic here, possibly using useSip() context
   };
 
   const handleDelete = (recordId: string) => {
+    // In a real app, this would also call a backend to delete the record
     setHistory(prev => prev.filter(r => r.id !== recordId));
     toast({ title: "Enregistrement d'appel supprimé.", variant: "destructive" });
   };
@@ -41,7 +48,12 @@ export default function HistoryPage() {
       .filter(record => {
         if (filterOutcome === 'all') return true;
         if (filterOutcome === 'outgoing') return record.direction === 'outgoing';
-        return record.outcome === filterOutcome;
+        // Ensure outcome matches, French terms were in dummy data, English in type
+        const outcomeLc = record.outcome.toLowerCase();
+        const filterOutcomeLc = filterOutcome.toLowerCase();
+        if (filterOutcomeLc === 'answered' && (outcomeLc === 'answered' || outcomeLc === 'répondu')) return true;
+        if (filterOutcomeLc === 'missed' && (outcomeLc === 'missed' || outcomeLc === 'manqué')) return true;
+        return outcomeLc === filterOutcomeLc;
       })
       .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [history, searchTerm, filterType, filterOutcome]);
@@ -83,7 +95,7 @@ export default function HistoryPage() {
               <SelectItem value="outgoing">Sortant</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto" onClick={() => toast({title:"Info Fonctionnalité", description:"Des options de filtrage avancées seront disponibles ici."})}>
             <SlidersHorizontal className="mr-2 h-4 w-4" /> Plus de Filtres
           </Button>
         </div>
@@ -101,9 +113,10 @@ export default function HistoryPage() {
           ))}
         </div>
       ) : (
-        <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
+        <div className="text-muted-foreground text-center py-16 flex flex-col items-center gap-3">
           <ListX size={48} />
-          <p>Aucun enregistrement d'historique d'appel ne correspond à vos filtres, ou votre historique est vide.</p>
+          <p className="text-lg">Aucun historique d'appel pour le moment.</p>
+          <p className="text-sm">Vos appels passés et reçus apparaîtront ici.</p>
         </div>
       )}
     </div>

@@ -7,7 +7,7 @@ import { CallControls } from "@/components/custom/CallControls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PhoneCall, UserCircle2, PhoneIncoming as PhoneIncomingIcon, PhoneX, Video as VideoIcon, Mic, ServerCrash, ListX, Clock, Video, Users, History, Settings } from "lucide-react";
+import { PhoneCall, UserCircle2, PhoneIncoming as PhoneIncomingIcon, PhoneOff, Video as VideoIcon, Mic, ServerCrash, ListX, Clock, Video, Users, History, Settings, Ear, EarOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSip } from "@/contexts/SipContext";
 import { useToast } from "@/hooks/use-toast";
@@ -171,7 +171,7 @@ export default function CallsPage() {
                   <PhoneIncomingIcon className="mr-2 h-5 w-5" /> Answer
                 </Button>
                 <Button onClick={handleLocalHangUp} variant="destructive" className="px-6 py-3">
-                  <PhoneX className="mr-2 h-5 w-5" /> Decline
+                  <PhoneOff className="mr-2 h-5 w-5" /> Decline
                 </Button>
               </div>
             )}
@@ -221,6 +221,7 @@ export default function CallsPage() {
             <ListX size={48} className="text-muted-foreground mb-2" />
             <p className="text-muted-foreground">No recent calls to display.</p>
             <p className="text-sm text-muted-foreground">Your recent calls and favorite contacts will appear here.</p>
+            <Button variant="link" onClick={() => toast({ title: "Feature Info", description: "Recent calls and favorites will appear here once you make/receive calls and mark contacts as favorites."})}>Learn More</Button>
           </CardContent>
         </Card>
       </div>

@@ -1,11 +1,85 @@
 
+"use client"; 
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRightCircle, CheckCircle2 } from "lucide-react";
+import { ArrowRightCircle, CheckCircle2, Image as ImageIcon, Loader2 } from "lucide-react"; 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react"; 
+import { generateImage, type GenerateImageOutput } from '@/ai/flows/generate-image-flow'; 
+import { useToast } from "@/hooks/use-toast";
+
+interface AiImageState {
+  src: string;
+  loading: boolean;
+  error: boolean;
+}
 
 export default function HomePage() {
+  const { toast } = useToast();
+  const initialPlaceholder = "https://placehold.co/600x400.png";
+
+  const [videoCallImage, setVideoCallImage] = useState<AiImageState>({ src: initialPlaceholder, loading: true, error: false });
+  const [contactListImage, setContactListImage] = useState<AiImageState>({ src: initialPlaceholder, loading: true, error: false });
+
+  useEffect(() => {
+    const fetchImage = async (prompt: string, setImageState: React.Dispatch<React.SetStateAction<AiImageState>>) => {
+      try {
+        // Keep showing placeholder while loading new image
+        setImageState(prev => ({ ...prev, loading: true, error: false })); 
+        const result: GenerateImageOutput = await generateImage({ prompt });
+        if (result.imageDataUri) {
+          setImageState({ src: result.imageDataUri, loading: false, error: false });
+        } else {
+          throw new Error("Image data URI is empty");
+        }
+      } catch (err) {
+        console.error(`Failed to generate image for prompt "${prompt}":`, err);
+        setImageState({ src: initialPlaceholder, loading: false, error: true });
+        toast({
+          title: "Image Generation Failed",
+          description: `Could not load an image for: ${prompt}. Displaying placeholder.`,
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchImage("crystal clear video call interface for a modern communication app, showcasing clarity and connection", setVideoCallImage);
+    fetchImage("well-organized digital contact list or address book in a clean, user-friendly app UI, conveying efficiency", setContactListImage);
+  }, [toast]);
+
+  const renderImage = (imageState: AiImageState, altText: string, dataAiHint: string) => {
+    if (imageState.loading) {
+      return (
+        <div className="w-full h-[200px] sm:h-[220px] md:h-[250px] flex items-center justify-center bg-muted/50 rounded-md mt-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+      );
+    }
+    // Show placeholder on error or if src is still the initial placeholder after attempting to load
+    if (imageState.error || (imageState.src === initialPlaceholder && !imageState.loading)) { 
+      return (
+         <div className="w-full h-[200px] sm:h-[220px] md:h-[250px] flex flex-col items-center justify-center bg-muted/50 rounded-md text-center p-4 mt-4">
+          <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
+          <p className="text-xs text-muted-foreground">Image loading failed. Placeholder shown.</p>
+        </div>
+      );
+    }
+    return (
+      <Image 
+        src={imageState.src} 
+        alt={altText} 
+        width={600} 
+        height={400} 
+        className="rounded-md mt-4 object-cover w-full h-auto max-h-[250px]"
+        data-ai-hint={dataAiHint}
+        priority={false} 
+      />
+    );
+  };
+
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background to-primary/20 p-4 sm:p-8 text-center">
       <header className="mb-12">
@@ -31,7 +105,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Enjoy reliable audio and video communication powered by SIP with Asterisk technology.</p>
-            <Image src="https://placehold.co/600x400.png" alt="Video call illustration" width={600} height={400} className="rounded-md mt-4" data-ai-hint="video call" />
+            {renderImage(videoCallImage, "Video call illustration", "video call")}
           </CardContent>
         </Card>
         <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
@@ -40,7 +114,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Manage your contacts and keep track of your call history, all in one intuitive interface.</p>
-             <Image src="https://placehold.co/600x400.png" alt="Contact management illustration" width={600} height={400} className="rounded-md mt-4" data-ai-hint="contact list" />
+             {renderImage(contactListImage, "Contact management illustration", "contact list")}
           </CardContent>
         </Card>
       </div>

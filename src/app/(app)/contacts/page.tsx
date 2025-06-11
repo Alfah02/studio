@@ -4,45 +4,36 @@
 import { useState, useMemo } from 'react';
 import { PageTitle } from "@/components/custom/PageTitle";
 import { ContactListItem } from "@/components/custom/ContactListItem";
-import { ContactForm } from "@/components/custom/ContactForm";
-import { Button } from "@/components/ui/button";
+// ContactForm import removed
+import { Button } from "@/components/ui/button"; // Button might still be used for other actions later, or can be removed if not.
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+// Dialog and DialogTrigger removed as ContactForm is removed
 import type { Contact } from '@/lib/types';
-import { PlusCircle, Search, Star, Users, UsersRound, StarOff } from 'lucide-react';
+import { Search, Star, Users, UsersRound, StarOff } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingContact, setEditingContact] = useState<Contact | undefined>(undefined);
+  const [contacts, setContacts] = useState<Contact[]>([]); // Contacts will be populated from server in a real app
+  // isFormOpen and editingContact states removed
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  const handleFormSubmit = (data: Omit<Contact, 'id' | 'isFavorite'>) => {
-    if (editingContact) {
-      setContacts(prev => prev.map(c => c.id === editingContact.id ? { ...editingContact, ...data } : c));
-      toast({ title: "Contact Mis à Jour", description: `${data.name} a été mis à jour.` });
-    } else {
-      const newContact: Contact = { ...data, id: Date.now().toString(), isFavorite: false };
-      setContacts(prev => [newContact, ...prev]);
-      toast({ title: "Contact Ajouté", description: `${data.name} a été ajouté.` });
-    }
-    setIsFormOpen(false);
-    setEditingContact(undefined);
-  };
+  // handleFormSubmit removed
 
+  // handleEdit would need to be re-thought if contacts are server-managed and read-only locally, or trigger server-side edit.
+  // For now, let's assume local edit is not a primary feature if contacts are server-managed.
   const handleEdit = (contact: Contact) => {
-    setEditingContact(contact);
-    setIsFormOpen(true);
+    toast({ title: "Info", description: `La modification des contacts se fait via le système central (par exemple, Asterisk). ${contact.name}` });
   };
 
+  // handleDelete would also need to trigger server-side deletion.
   const handleDelete = (contactId: string) => {
     const contactToDelete = contacts.find(c => c.id === contactId);
-    setContacts(prev => prev.filter(c => c.id !== contactId));
+    // Placeholder for server-side deletion
+    // setContacts(prev => prev.filter(c => c.id !== contactId)); 
     if (contactToDelete) {
-      toast({ title: "Contact Supprimé", description: `${contactToDelete.name} a été supprimé.`, variant: "destructive" });
+      toast({ title: "Info", description: `La suppression des contacts se fait via le système central. Tentative de suppression de ${contactToDelete.name} (simulé).`, variant: "default" });
     }
   };
   
@@ -51,9 +42,11 @@ export default function ContactsPage() {
       title: `Démarrage de l'appel ${type}...`,
       description: `Appel de ${contact.name} (${contact.number})`,
     });
+    // Actual call logic would use useSip() context to make a call
   };
 
   const handleToggleFavorite = (contactId: string) => {
+    // Favorite status might be a local preference or synced with server
     setContacts(prev => 
       prev.map(c => 
         c.id === contactId ? { ...c, isFavorite: !c.isFavorite } : c
@@ -93,14 +86,7 @@ export default function ContactsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Dialog open={isFormOpen} onOpenChange={ (open) => { setIsFormOpen(open); if(!open) setEditingContact(undefined); }}>
-            <DialogTrigger asChild>
-              <Button onClick={() => { setEditingContact(undefined); setIsFormOpen(true); }} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                <PlusCircle className="mr-2 h-5 w-5" /> Ajouter un Contact
-              </Button>
-            </DialogTrigger>
-            {isFormOpen && <ContactForm onSubmit={handleFormSubmit} initialData={editingContact} onClose={() => { setIsFormOpen(false); setEditingContact(undefined); }} />}
-          </Dialog>
+          {/* "Ajouter un Contact" button and Dialog removed */}
         </div>
       </div>
 
@@ -126,8 +112,8 @@ export default function ContactsPage() {
           ) : (
             <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
               <UsersRound size={48} />
-              <p>Aucun contact disponible.</p>
-              <p className="text-sm">Vous pouvez ajouter des contacts localement en utilisant le bouton 'Ajouter un Contact'.</p>
+              <p>Aucun contact à afficher.</p>
+              <p className="text-sm">Les contacts sont gérés de manière centralisée et apparaîtront ici une fois synchronisés ou configurés sur le serveur.</p>
             </div>
           )}
         </TabsContent>

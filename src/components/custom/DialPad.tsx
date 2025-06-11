@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -7,9 +8,10 @@ import { Delete } from 'lucide-react';
 
 interface DialPadProps {
   onDial: (number: string) => void;
+  disabled?: boolean;
 }
 
-export function DialPad({ onDial }: DialPadProps) {
+export function DialPad({ onDial, disabled = false }: DialPadProps) {
   const [number, setNumber] = useState('');
 
   const handleButtonClick = (digit: string) => {
@@ -23,7 +25,7 @@ export function DialPad({ onDial }: DialPadProps) {
   const handleDial = () => {
     if (number) {
       onDial(number);
-      // setNumber(''); // Optionally clear after dialing
+      // setNumber(''); // Optionally clear after dialing, or keep for redial
     }
   };
 
@@ -41,12 +43,13 @@ export function DialPad({ onDial }: DialPadProps) {
           type="text" 
           value={number} 
           onChange={(e) => setNumber(e.target.value)}
-          placeholder="Enter number" 
-          className="text-center text-2xl h-14 pr-10" 
-          aria-label="Dial number"
+          placeholder="Enter number or SIP URI" 
+          className="text-center text-xl sm:text-2xl h-14 pr-10" 
+          aria-label="Dial number or SIP URI"
+          disabled={disabled}
         />
         {number && (
-          <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10" onClick={handleBackspace} aria-label="Backspace">
+          <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10" onClick={handleBackspace} aria-label="Backspace" disabled={disabled}>
             <Delete className="h-5 w-5" />
           </Button>
         )}
@@ -56,8 +59,9 @@ export function DialPad({ onDial }: DialPadProps) {
           <Button 
             key={btn} 
             variant="outline"
-            className="text-2xl h-16 transition-transform active:scale-95" 
+            className="text-xl sm:text-2xl h-16 transition-transform active:scale-95" 
             onClick={() => handleButtonClick(btn)}
+            disabled={disabled}
           >
             {btn}
           </Button>
@@ -66,7 +70,7 @@ export function DialPad({ onDial }: DialPadProps) {
       <Button 
         className="w-full h-14 text-lg bg-accent text-accent-foreground hover:bg-accent/90" 
         onClick={handleDial}
-        disabled={!number}
+        disabled={!number || disabled}
       >
         Dial
       </Button>

@@ -1,4 +1,6 @@
 
+import type * as JsSIP from 'jssip';
+
 export interface SipConfig {
   uri: string;
   password?: string;
@@ -17,8 +19,10 @@ export type SipConnectionStatus =
 
 export interface SipCall {
   id: string; // JsSIP session ID
+  session: JsSIP.RTCSession; // The actual JsSIP session
   direction: 'incoming' | 'outgoing';
   remoteIdentity: string; // SIP URI of the other party
-  status: 'initiating' | 'ringing' | 'answered' | 'held' | 'resumed' | 'ended' | 'failed';
-  // Add more call properties as needed (e.g., media streams)
+  status: 'initiating' | 'ringing' | 'answered' | 'progress' | 'held' | 'resumed' | 'ended' | 'failed';
+  localStream?: MediaStream;
+  remoteStream?: MediaStream;
 }

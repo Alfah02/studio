@@ -98,7 +98,7 @@ export default function HomePage() {
       <div className="grid md:grid-cols-2 gap-8 max-w-4xl mb-12 w-full">
         <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
           <CardHeader>
-            <CardTitle className="text-2xl font-headline flex items-center"><CheckCircle2 className="mr-2 text-accent"/> Appels d'une Clarté Exceptionnelle</CardTitle>
+            <CardTitle className="text-2xl font-headline flex items-center"><CheckCircle2 className="mr-2 text-accent"/> Appels Ultra-Clairs</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Profitez d'une communication audio et vidéo fiable grâce à la technologie SIP avec Asterisk.</p>

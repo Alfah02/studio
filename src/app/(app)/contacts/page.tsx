@@ -127,7 +127,6 @@ export default function ContactsPage() {
             <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
               <UsersRound size={48} />
               <p>Aucun contact disponible.</p>
-              <p className="text-sm">Dans un système de production, les contacts seraient typiquement synchronisés depuis un serveur central.</p>
               <p className="text-sm">Vous pouvez ajouter des contacts localement en utilisant le bouton 'Ajouter un Contact'.</p>
             </div>
           )}

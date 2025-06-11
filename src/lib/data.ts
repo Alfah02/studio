@@ -1,12 +1,6 @@
 import type { Contact, CallRecord } from './types';
 
-export const dummyContacts: Contact[] = [
-  { id: '1', name: 'Alice Wonderland', number: '+1-555-0100', email: 'alice@vidapp.com', avatarUrl: 'https://placehold.co/40x40.png', isFavorite: true },
-  { id: '2', name: 'Bob The Builder', number: '+1-555-0101', email: 'bob@vidapp.org', avatarUrl: 'https://placehold.co/40x40.png' },
-  { id: '3', name: 'Charlie Brown', number: '+1-555-0102', email: 'charlie@vidapp.com', isFavorite: true },
-  { id: '4', name: 'Diana Prince', number: '+1-555-0103', email: 'diana@vidapp.org', avatarUrl: 'https://placehold.co/40x40.png' },
-  { id: '5', name: 'Edward Scissorhands', number: '+1-555-0104', email: 'edward@vidapp.com' },
-];
+export const dummyContacts: Contact[] = [];
 
 export const dummyCallHistory: CallRecord[] = [
   { id: '1', contactName: 'Alice Wonderland', contactNumber: '+1-555-0100', type: 'video', direction: 'outgoing', outcome: 'answered', date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), duration: '5m 32s' },

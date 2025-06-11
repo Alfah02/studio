@@ -8,14 +8,14 @@ import { ContactForm } from "@/components/custom/ContactForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { dummyContacts } from "@/lib/data";
+// import { dummyContacts } from "@/lib/data"; // Dummy data removed
 import type { Contact } from '@/lib/types';
 import { PlusCircle, Search, Star, Users, UsersRound, StarOff } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(dummyContacts);
+  const [contacts, setContacts] = useState<Contact[]>([]); // Initialize with empty array
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,7 +52,7 @@ export default function ContactsPage() {
       title: `Starting ${type} call...`,
       description: `Calling ${contact.name} (${contact.number})`,
     });
-    // In a real app, you'd initiate the call here.
+    // In a real app, you'd initiate the call here using SipContext.
     // Potentially redirect to calls page or open a call modal.
   };
 
@@ -129,7 +129,9 @@ export default function ContactsPage() {
           ) : (
             <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
               <UsersRound size={48} />
-              <p>No contacts found. Add new contacts to get started!</p>
+              <p>No contacts available.</p>
+              <p className="text-sm">In a production system, contacts would typically be synchronized from a central server.</p>
+              <p className="text-sm">You can add contacts locally using the 'Add Contact' button.</p>
             </div>
           )}
         </TabsContent>
@@ -150,7 +152,8 @@ export default function ContactsPage() {
           ) : (
              <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
               <StarOff size={48} />
-              <p>No favorite contacts yet. Mark some contacts as favorites!</p>
+              <p>No favorite contacts yet.</p>
+              <p className="text-sm">Mark some contacts as favorites, and they will appear here.</p>
             </div>
           )}
         </TabsContent>

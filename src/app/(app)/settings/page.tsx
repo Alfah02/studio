@@ -9,28 +9,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { User, Bell, Shield, Volume2, Video, LogOut, Save, ExternalLink, Mic, BellRing, BellMinus, ShieldAlert, Info, Copyright, Cog, LifeBuoy, FileText, PhoneCall, KeyRound, UserCheck, Router, Server, Wifi, WifiOff, Link as LinkIcon, Unlink } from "lucide-react";
+import { User, Bell, Shield, Volume2, Video, LogOut, Save, ExternalLink, Mic, BellRing, BellMinus, ShieldAlert, Info, Copyright, Cog, LifeBuoy, FileText, PhoneCall, KeyRound, UserCheck, Router, Server, Wifi, WifiOff, Link as LinkIcon, Unlink, AlertCircle, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSip } from "@/contexts/SipContext";
-import type { SipConfig } from "@/lib/sip/types";
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const { connectSip, disconnectSip, connectionStatus, sipConfig: currentSipConfig } = useSip();
-
-  const [sipUsername, setSipUsername] = useState(currentSipConfig?.username || '');
-  const [sipPassword, setSipPassword] = useState(currentSipConfig?.password || '');
-  const [sipServerUri, setSipServerUri] = useState(currentSipConfig?.server || '');
-  
-  useEffect(() => {
-    if (currentSipConfig) {
-      setSipUsername(currentSipConfig.username);
-      setSipPassword(currentSipConfig.password || '');
-      setSipServerUri(currentSipConfig.server);
-    }
-  }, [currentSipConfig]);
-
+  const router = useRouter();
+  const { disconnectSip, connectionStatus, sipConfig } = useSip();
 
   const handleSaveChanges = (section: string) => {
     toast({
@@ -39,36 +26,9 @@ export default function SettingsPage() {
     });
   };
 
-  const handleSaveSipConfig = async () => {
-    if (!sipUsername || !sipServerUri) {
-      toast({
-        title: "Erreur de Configuration SIP",
-        description: "Le nom d'utilisateur SIP et l'URI du serveur sont requis.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newConfig: SipConfig = {
-      username: sipUsername,
-      password: sipPassword,
-      server: sipServerUri,
-      uri: `sip:${sipUsername}@${sipServerUri.includes('://') ? new URL(sipServerUri).hostname : sipServerUri.split(':')[0]}`
-    };
-
-    try {
-      await connectSip(newConfig);
-    } catch (error) {
-      toast({
-        title: "Échec de la Connexion SIP",
-        description: error instanceof Error ? error.message : "Une erreur inconnue s'est produite.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDisconnectSip = () => {
+  const handleDisconnectAndLogin = () => {
     disconnectSip();
+    router.push('/login');
   };
   
   const getConnectionStatusText = () => {
@@ -110,8 +70,8 @@ export default function SettingsPage() {
               <Input id="displayName" defaultValue="Votre Nom" />
             </div>
             <div>
-              <Label htmlFor="sipAddress">Adresse SIP (du serveur)</Label>
-              <Input id="sipAddress" defaultValue={currentSipConfig ? currentSipConfig.uri : "N/A"} disabled />
+              <Label htmlFor="sipAddress">Adresse SIP Actuelle</Label>
+              <Input id="sipAddress" value={sipConfig && connectionStatus === 'registered' ? sipConfig.uri : "Non connecté"} disabled />
             </div>
              <a href="https://vidapp.com/account" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" className="w-full"><ExternalLink className="mr-2 h-4 w-4" /> Gérer le Compte sur vidapp.com</Button>
@@ -130,45 +90,33 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="sipUsername" className="flex items-center"><UserCheck className="mr-2 h-4 w-4 text-muted-foreground" />Nom d'utilisateur SIP</Label>
-              <Input 
-                id="sipUsername" 
-                placeholder="ex: 1001 ou votre_utilisateur" 
-                value={sipUsername}
-                onChange={(e) => setSipUsername(e.target.value)}
-                disabled={connectionStatus === 'connecting' || connectionStatus === 'connected' || connectionStatus === 'registered'}
-              />
-            </div>
-            <div>
-              <Label htmlFor="sipPassword" className="flex items-center"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" />Mot de passe SIP</Label>
-              <Input 
-                id="sipPassword" 
-                type="password"
-                placeholder="Votre mot de passe SIP" 
-                value={sipPassword}
-                onChange={(e) => setSipPassword(e.target.value)}
-                disabled={connectionStatus === 'connecting' || connectionStatus === 'connected' || connectionStatus === 'registered'}
-              />
-            </div>
-            <div>
-              <Label htmlFor="sipServerUri" className="flex items-center"><Server className="mr-2 h-4 w-4 text-muted-foreground" />URI du Serveur SIP (WebSocket)</Label>
-              <Input 
-                id="sipServerUri" 
-                placeholder="wss://asterisk.example.com:8089/ws" 
-                value={sipServerUri}
-                onChange={(e) => setSipServerUri(e.target.value)}
-                disabled={connectionStatus === 'connecting' || connectionStatus === 'connected' || connectionStatus === 'registered'}
-              />
-            </div>
-            {connectionStatus === 'disconnected' || connectionStatus === 'error' || connectionStatus === 'unregistered' || connectionStatus === 'registration_failed' ? (
-              <Button onClick={handleSaveSipConfig} className="w-full bg-green-600 hover:bg-green-700 text-white">
-                <LinkIcon className="mr-2 h-4 w-4" /> Connecter & Enregistrer
-              </Button>
+            {connectionStatus === 'registered' && sipConfig ? (
+              <>
+                <div className="space-y-1">
+                    <p className="text-sm font-medium">Nom d'utilisateur SIP:</p>
+                    <p className="text-sm text-muted-foreground p-2 bg-muted rounded-md">{sipConfig.username}</p>
+                </div>
+                <div className="space-y-1">
+                    <p className="text-sm font-medium">Serveur SIP:</p>
+                    <p className="text-sm text-muted-foreground p-2 bg-muted rounded-md">{sipConfig.server}</p>
+                </div>
+                <Button onClick={disconnectSip} className="w-full bg-red-600 hover:bg-red-700 text-white" variant="destructive">
+                  <Unlink className="mr-2 h-4 w-4" /> Se Déconnecter du SIP
+                </Button>
+                 <Button onClick={handleDisconnectAndLogin} className="w-full" variant="outline">
+                  <LogIn className="mr-2 h-4 w-4" /> Changer d'Identifiants SIP
+                </Button>
+              </>
             ) : (
-              <Button onClick={handleDisconnectSip} className="w-full bg-red-600 hover:bg-red-700 text-white" variant="destructive">
-                <Unlink className="mr-2 h-4 w-4" /> Déconnecter
-              </Button>
+              <div className="flex flex-col items-center text-center p-4 bg-muted/30 rounded-md">
+                <AlertCircle className="h-8 w-8 text-primary mb-2" />
+                <p className="text-sm text-muted-foreground mb-3">
+                  Vous n'êtes actuellement pas connecté au service SIP.
+                </p>
+                <Button onClick={() => router.push('/login')} className="w-full bg-green-600 hover:bg-green-700 text-white">
+                  <LinkIcon className="mr-2 h-4 w-4" /> Aller à la Page de Connexion
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -294,12 +242,16 @@ export default function SettingsPage() {
 
          <Card className="shadow-lg col-span-1 md:col-span-2 lg:col-span-1">
           <CardHeader>
-            <CardTitle className="flex items-center"><LogOut className="mr-2 text-destructive" /> Déconnexion</CardTitle>
-            <CardDescription>Déconnectez-vous de votre compte VidApp Connect.</CardDescription>
+            <CardTitle className="flex items-center"><LogOut className="mr-2 text-destructive" /> Déconnexion Générale</CardTitle>
+            <CardDescription>Déconnectez-vous de votre compte VidApp Connect et du service SIP.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="destructive" className="w-full" onClick={() => toast({title: "Déconnecté", description: "Vous avez été déconnecté avec succès. (Simulé)"})}>
-              <LogOut className="mr-2 h-4 w-4" /> Déconnexion
+            <Button variant="destructive" className="w-full" onClick={() => {
+                disconnectSip(); 
+                router.push('/login');
+                toast({title: "Déconnecté", description: "Vous avez été déconnecté avec succès."});
+            }}>
+              <LogOut className="mr-2 h-4 w-4" /> Se Déconnecter de Partout
             </Button>
           </CardContent>
         </Card>

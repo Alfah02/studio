@@ -1,6 +1,10 @@
+
+// No "use client" here, this is a Server Component
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { AppClientProviders } from './providers'; // Import the new client provider wrapper
 
 export const metadata: Metadata = {
   title: 'VidApp Connect',
@@ -20,7 +24,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        {children}
+        <AppClientProviders> {/* Wrap children with the new client provider component */}
+          {children}
+        </AppClientProviders>
         <Toaster />
       </body>
     </html>

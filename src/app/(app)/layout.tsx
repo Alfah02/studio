@@ -3,7 +3,7 @@
 
 import { Header } from '@/components/custom/Header';
 import type { ReactNode } from 'react';
-import { SipProvider, useSip } from '@/contexts/SipContext';
+import { useSip } from '@/contexts/SipContext'; // SipProvider import removed, useSip remains
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -68,9 +68,6 @@ function ProtectedLayout({ children }: { children: ReactNode }) {
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  return (
-    <SipProvider>
-      <ProtectedLayout>{children}</ProtectedLayout>
-    </SipProvider>
-  );
+  // SipProvider is no longer here, it's in the root layout
+  return <ProtectedLayout>{children}</ProtectedLayout>;
 }

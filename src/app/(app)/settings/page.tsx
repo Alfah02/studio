@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { User, Bell, Shield, Volume2, Video, LogOut, Save, ExternalLink, Mic, BellRing, BellMinus, ShieldAlert, Info, Copyright, Cog, LifeBuoy, FileText, PhoneCall, KeyRound, UserCheck, Router } from "lucide-react";
+import { User, Bell, Shield, Volume2, Video, LogOut, Save, ExternalLink, Mic, BellRing, BellMinus, ShieldAlert, Info, Copyright, Cog, LifeBuoy, FileText, PhoneCall, KeyRound, UserCheck, Router, Server } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -92,7 +92,7 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <Label htmlFor="sipServerUri" className="flex items-center"><Router className="mr-2 h-4 w-4 text-muted-foreground" />SIP Server URI</Label>
+              <Label htmlFor="sipServerUri" className="flex items-center"><Server className="mr-2 h-4 w-4 text-muted-foreground" />SIP Server URI (WebSocket)</Label>
               <Input 
                 id="sipServerUri" 
                 placeholder="wss://asterisk.example.com:8089/ws" 

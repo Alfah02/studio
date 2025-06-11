@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRightCircle, CheckCircle2 } from "lucide-react";
@@ -30,7 +31,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Enjoy reliable audio and video communication powered by SIP with Asterisk technology.</p>
-            <Image src="https://placehold.co/600x400.png" alt="Video call illustration" width={600} height={400} className="rounded-md mt-4" data-ai-hint="communication technology" />
+            <Image src="https://placehold.co/600x400.png" alt="Video call illustration" width={600} height={400} className="rounded-md mt-4" data-ai-hint="video call" />
           </CardContent>
         </Card>
         <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
@@ -39,7 +40,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Manage your contacts and keep track of your call history, all in one intuitive interface.</p>
-             <Image src="https://placehold.co/600x400.png" alt="Contact management illustration" width={600} height={400} className="rounded-md mt-4" data-ai-hint="contacts organization" />
+             <Image src="https://placehold.co/600x400.png" alt="Contact management illustration" width={600} height={400} className="rounded-md mt-4" data-ai-hint="contact list" />
           </CardContent>
         </Card>
       </div>

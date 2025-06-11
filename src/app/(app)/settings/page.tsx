@@ -9,17 +9,31 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { User, Bell, Shield, Volume2, Video, LogOut, Save, ExternalLink, Mic, BellRing, BellMinus, ShieldAlert, Info, Copyright, Cog, LifeBuoy, FileText } from "lucide-react";
+import { User, Bell, Shield, Volume2, Video, LogOut, Save, ExternalLink, Mic, BellRing, BellMinus, ShieldAlert, Info, Copyright, Cog, LifeBuoy, FileText, PhoneCall, KeyRound, UserCheck, Router } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const [sipUsername, setSipUsername] = useState('');
+  const [sipPassword, setSipPassword] = useState('');
+  const [sipServerUri, setSipServerUri] = useState('');
 
   const handleSaveChanges = (section: string) => {
     toast({
       title: "Settings Saved",
       description: `${section} settings have been updated. (Simulated)`,
     });
+  };
+
+  const handleSaveSipConfig = () => {
+    // In a real app, you would securely store these (e.g., context, localStorage, or send to a backend)
+    // and potentially try to register with the SIP server.
+    toast({
+      title: "SIP Configuration Saved",
+      description: "Your SIP details have been saved. (Simulated)",
+    });
+    console.log("SIP Config:", { sipUsername, sipPassword, sipServerUri });
   };
   
   return (
@@ -39,7 +53,7 @@ export default function SettingsPage() {
               <Input id="displayName" defaultValue="Your Name" />
             </div>
             <div>
-              <Label htmlFor="sipAddress">SIP Address</Label>
+              <Label htmlFor="sipAddress">SIP Address (from server)</Label>
               <Input id="sipAddress" defaultValue="you@vidapp.com" disabled />
             </div>
              <a href="https://vidapp.com/account" target="_blank" rel="noopener noreferrer">
@@ -47,6 +61,47 @@ export default function SettingsPage() {
             </a>
             <Button onClick={() => handleSaveChanges("Account")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
               <Save className="mr-2 h-4 w-4" /> Save Account Changes
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* SIP Configuration Settings */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center"><PhoneCall className="mr-2 text-primary" /> SIP Configuration</CardTitle>
+            <CardDescription>Configure your SIP account details for making calls.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="sipUsername" className="flex items-center"><UserCheck className="mr-2 h-4 w-4 text-muted-foreground" />SIP Username</Label>
+              <Input 
+                id="sipUsername" 
+                placeholder="e.g., 1001 or your_user" 
+                value={sipUsername}
+                onChange={(e) => setSipUsername(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="sipPassword" className="flex items-center"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" />SIP Password</Label>
+              <Input 
+                id="sipPassword" 
+                type="password"
+                placeholder="Your SIP password" 
+                value={sipPassword}
+                onChange={(e) => setSipPassword(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="sipServerUri" className="flex items-center"><Router className="mr-2 h-4 w-4 text-muted-foreground" />SIP Server URI</Label>
+              <Input 
+                id="sipServerUri" 
+                placeholder="wss://asterisk.example.com:8089/ws" 
+                value={sipServerUri}
+                onChange={(e) => setSipServerUri(e.target.value)}
+              />
+            </div>
+            <Button onClick={handleSaveSipConfig} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Save className="mr-2 h-4 w-4" /> Save SIP Configuration
             </Button>
           </CardContent>
         </Card>
@@ -83,7 +138,7 @@ export default function SettingsPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="cameraSelect" className="flex items-center">Camera <Video className="inline ml-1 h-4 w-4 text-muted-foreground" /></Label>
+              <Label htmlFor="cameraSelect" className="flex items-center"><Video className="mr-2 h-4 w-4 text-muted-foreground" />Camera</Label>
               <Select defaultValue="default">
                 <SelectTrigger id="cameraSelect">
                   <SelectValue placeholder="Select Camera" />
@@ -158,7 +213,7 @@ export default function SettingsPage() {
         {/* About Section */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>About VidApp Connect</CardTitle>
+            <CardTitle className="flex items-center"><Info className="mr-2 text-primary"/>About VidApp Connect</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="flex items-center"><Info className="mr-2 h-4 w-4 text-muted-foreground" /> Version: 1.0.0 (Alpha)</p>
@@ -190,3 +245,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    

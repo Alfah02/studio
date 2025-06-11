@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PageTitle } from "@/components/custom/PageTitle";
@@ -7,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import { PhoneOutgoing, UserCircle2 } from "lucide-react";
+import { PhoneOutgoing, UserCircle2, ListX, Clock } from "lucide-react";
 import { useState } from "react";
 
 export default function CallsPage() {
@@ -66,7 +67,10 @@ export default function CallsPage() {
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 p-4">
                 <UserCircle2 size={128} className="text-foreground/50 mb-4" />
                 <p className="text-2xl font-semibold text-foreground">{dialedNumber}</p>
-                <p className="text-muted-foreground">00:00:00</p> {/* Placeholder for call timer */}
+                <div className="flex items-center text-muted-foreground">
+                  <Clock size={16} className="mr-1" />
+                  <span>00:00:00</span> {/* Placeholder for call timer */}
+                </div>
               </div>
             </div>
             <CallControls onHangUp={handleHangUp} />
@@ -86,7 +90,8 @@ export default function CallsPage() {
             <CardHeader>
               <CardTitle>Recent Calls / Favorites</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 min-h-[200px] flex flex-col items-center justify-center">
+            <CardContent className="space-y-3 min-h-[200px] flex flex-col items-center justify-center text-center">
+              <ListX size={48} className="text-muted-foreground mb-2" />
               <p className="text-muted-foreground">No recent calls to display.</p>
               <p className="text-sm text-muted-foreground">Your recent calls and favorite contacts will appear here.</p>
             </CardContent>

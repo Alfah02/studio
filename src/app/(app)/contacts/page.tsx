@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { dummyContacts } from "@/lib/data";
 import type { Contact } from '@/lib/types';
-import { PlusCircle, Search, Star, Users } from 'lucide-react';
+import { PlusCircle, Search, Star, Users, UsersRound, StarOff } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -126,7 +127,10 @@ export default function ContactsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground text-center py-8">No contacts found. Add new contacts to get started!</p>
+            <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
+              <UsersRound size={48} />
+              <p>No contacts found. Add new contacts to get started!</p>
+            </div>
           )}
         </TabsContent>
         <TabsContent value="favorites">
@@ -144,7 +148,10 @@ export default function ContactsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground text-center py-8">No favorite contacts yet. Mark some contacts as favorites!</p>
+             <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
+              <StarOff size={48} />
+              <p>No favorite contacts yet. Mark some contacts as favorites!</p>
+            </div>
           )}
         </TabsContent>
       </Tabs>

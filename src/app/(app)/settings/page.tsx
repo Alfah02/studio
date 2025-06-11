@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PageTitle } from "@/components/custom/PageTitle";
@@ -8,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { User, Bell, Shield, Volume2, Video, LogOut } from "lucide-react";
+import { User, Bell, Shield, Volume2, Video, LogOut, Save, ExternalLink, Mic, BellRing, BellMinus, ShieldAlert, Info, Copyright, Cog, LifeBuoy, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
@@ -42,9 +43,11 @@ export default function SettingsPage() {
               <Input id="sipAddress" defaultValue="you@vidapp.com" disabled />
             </div>
              <a href="https://vidapp.com/account" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="w-full">Manage Account on vidapp.com</Button>
+              <Button variant="outline" className="w-full"><ExternalLink className="mr-2 h-4 w-4" /> Manage Account on vidapp.com</Button>
             </a>
-            <Button onClick={() => handleSaveChanges("Account")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Save Account Changes</Button>
+            <Button onClick={() => handleSaveChanges("Account")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Save className="mr-2 h-4 w-4" /> Save Account Changes
+            </Button>
           </CardContent>
         </Card>
 
@@ -56,7 +59,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="micSelect">Microphone</Label>
+              <Label htmlFor="micSelect" className="flex items-center"><Mic className="mr-2 h-4 w-4 text-muted-foreground" />Microphone</Label>
               <Select defaultValue="default">
                 <SelectTrigger id="micSelect">
                   <SelectValue placeholder="Select Microphone" />
@@ -68,7 +71,7 @@ export default function SettingsPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="speakerSelect">Speakers</Label>
+              <Label htmlFor="speakerSelect" className="flex items-center"><Volume2 className="mr-2 h-4 w-4 text-muted-foreground" />Speakers</Label>
               <Select defaultValue="default">
                 <SelectTrigger id="speakerSelect">
                   <SelectValue placeholder="Select Speakers" />
@@ -80,7 +83,7 @@ export default function SettingsPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="cameraSelect">Camera <Video className="inline ml-1 h-4 w-4" /></Label>
+              <Label htmlFor="cameraSelect" className="flex items-center">Camera <Video className="inline ml-1 h-4 w-4 text-muted-foreground" /></Label>
               <Select defaultValue="default">
                 <SelectTrigger id="cameraSelect">
                   <SelectValue placeholder="Select Camera" />
@@ -91,7 +94,9 @@ export default function SettingsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => handleSaveChanges("Audio/Video")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Save Device Settings</Button>
+            <Button onClick={() => handleSaveChanges("Audio/Video")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Save className="mr-2 h-4 w-4" /> Save Device Settings
+            </Button>
           </CardContent>
         </Card>
 
@@ -103,18 +108,26 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label htmlFor="incomingCallNotifs" className="flex-grow">Incoming Call Notifications</Label>
+              <Label htmlFor="incomingCallNotifs" className="flex-grow flex items-center">
+                <BellRing className="mr-2 h-4 w-4 text-muted-foreground" /> Incoming Call Notifications
+              </Label>
               <Switch id="incomingCallNotifs" defaultChecked />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="missedCallNotifs" className="flex-grow">Missed Call Summaries</Label>
+              <Label htmlFor="missedCallNotifs" className="flex-grow flex items-center">
+                <BellMinus className="mr-2 h-4 w-4 text-muted-foreground" /> Missed Call Summaries
+              </Label>
               <Switch id="missedCallNotifs" />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="soundNotifs" className="flex-grow">Notification Sounds</Label>
+              <Label htmlFor="soundNotifs" className="flex-grow flex items-center">
+                <Volume2 className="mr-2 h-4 w-4 text-muted-foreground" /> Notification Sounds
+              </Label>
               <Switch id="soundNotifs" defaultChecked />
             </div>
-            <Button onClick={() => handleSaveChanges("Notifications")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Save Notification Preferences</Button>
+            <Button onClick={() => handleSaveChanges("Notifications")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Save className="mr-2 h-4 w-4" /> Save Notification Preferences
+            </Button>
           </CardContent>
         </Card>
 
@@ -126,15 +139,19 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label htmlFor="blockUnknown" className="flex-grow">Block calls from unknown numbers</Label>
+              <Label htmlFor="blockUnknown" className="flex-grow flex items-center">
+                <ShieldAlert className="mr-2 h-4 w-4 text-muted-foreground" /> Block calls from unknown numbers
+              </Label>
               <Switch id="blockUnknown" />
             </div>
             <div>
                 <a href="https://vidapp.org/privacy" target="_blank" rel="noopener noreferrer">
-                    <Button variant="link" className="p-0 h-auto">View Privacy Policy on vidapp.org</Button>
+                    <Button variant="link" className="p-0 h-auto flex items-center"><ExternalLink className="mr-1 h-3 w-3" />View Privacy Policy on vidapp.org</Button>
                 </a>
             </div>
-             <Button onClick={() => handleSaveChanges("Privacy")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Save Privacy Settings</Button>
+             <Button onClick={() => handleSaveChanges("Privacy")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                <Save className="mr-2 h-4 w-4" /> Save Privacy Settings
+             </Button>
           </CardContent>
         </Card>
         
@@ -144,15 +161,15 @@ export default function SettingsPage() {
             <CardTitle>About VidApp Connect</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p>Version: 1.0.0 (Alpha)</p>
-            <p>&copy; {new Date().getFullYear()} VidApp. All rights reserved.</p>
-            <p>Powered by SIP and Asterisk technologies.</p>
+            <p className="flex items-center"><Info className="mr-2 h-4 w-4 text-muted-foreground" /> Version: 1.0.0 (Alpha)</p>
+            <p className="flex items-center"><Copyright className="mr-2 h-4 w-4 text-muted-foreground" /> &copy; {new Date().getFullYear()} VidApp. All rights reserved.</p>
+            <p className="flex items-center"><Cog className="mr-2 h-4 w-4 text-muted-foreground" /> Powered by SIP and Asterisk technologies.</p>
             <Separator className="my-3"/>
             <a href="https://vidapp.com/support" target="_blank" rel="noopener noreferrer" className="block">
-              <Button variant="outline" className="w-full">Get Support</Button>
+              <Button variant="outline" className="w-full"><LifeBuoy className="mr-2 h-4 w-4" />Get Support</Button>
             </a>
              <a href="https://vidapp.org/terms" target="_blank" rel="noopener noreferrer" className="block mt-2">
-              <Button variant="outline" className="w-full">Terms of Service</Button>
+              <Button variant="outline" className="w-full"><FileText className="mr-2 h-4 w-4" />Terms of Service</Button>
             </a>
           </CardContent>
         </Card>
@@ -165,7 +182,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <Button variant="destructive" className="w-full" onClick={() => toast({title: "Logged Out", description: "You have been successfully logged out. (Simulated)"})}>
-              Logout
+              <LogOut className="mr-2 h-4 w-4" /> Logout
             </Button>
           </CardContent>
         </Card>

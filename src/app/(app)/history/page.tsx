@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -6,7 +7,7 @@ import { CallHistoryListItem } from "@/components/custom/CallHistoryListItem";
 import { dummyCallHistory } from "@/lib/data";
 import type { CallRecord } from '@/lib/types';
 import { Input } from "@/components/ui/input";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, ListX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -101,7 +102,10 @@ export default function HistoryPage() {
           ))}
         </div>
       ) : (
-        <p className="text-muted-foreground text-center py-8">No call history records match your filters, or your history is empty.</p>
+        <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
+          <ListX size={48} />
+          <p>No call history records match your filters, or your history is empty.</p>
+        </div>
       )}
     </div>
   );

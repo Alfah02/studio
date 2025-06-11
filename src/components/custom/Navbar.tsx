@@ -3,20 +3,20 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Phone, Users, History as HistoryIcon, Settings } from 'lucide-react'; // Renamed History to HistoryIcon
+import { Phone, Users, History as HistoryIcon, Settings } from 'lucide-react';
 
 const navItems = [
-  { href: '/calls', label: 'Calls', icon: Phone },
+  { href: '/calls', label: 'Appels', icon: Phone },
   { href: '/contacts', label: 'Contacts', icon: Users },
-  { href: '/history', label: 'History', icon: HistoryIcon },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/history', label: 'Historique', icon: HistoryIcon },
+  { href: '/settings', label: 'Paramètres', icon: Settings },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center space-x-1 sm:space-x-2 md:space-x-4" aria-label="Main navigation">
+    <nav className="flex items-center space-x-1 sm:space-x-2 md:space-x-4" aria-label="Navigation principale">
       {navItems.map((item) => {
         const isActive = pathname === item.href || (item.href === '/calls' && pathname === '/');
         return (

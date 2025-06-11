@@ -34,16 +34,16 @@ export default function SettingsPage() {
 
   const handleSaveChanges = (section: string) => {
     toast({
-      title: "Settings Saved",
-      description: `${section} settings have been updated. (Simulated)`,
+      title: "Paramètres Enregistrés",
+      description: `Les paramètres de ${section} ont été mis à jour. (Simulé)`,
     });
   };
 
   const handleSaveSipConfig = async () => {
     if (!sipUsername || !sipServerUri) {
       toast({
-        title: "SIP Configuration Error",
-        description: "SIP Username and Server URI are required.",
+        title: "Erreur de Configuration SIP",
+        description: "Le nom d'utilisateur SIP et l'URI du serveur sont requis.",
         variant: "destructive",
       });
       return;
@@ -53,16 +53,15 @@ export default function SettingsPage() {
       username: sipUsername,
       password: sipPassword,
       server: sipServerUri,
-      uri: `sip:${sipUsername}@${sipServerUri.includes('://') ? new URL(sipServerUri).hostname : sipServerUri.split(':')[0]}` // Construct a basic URI
+      uri: `sip:${sipUsername}@${sipServerUri.includes('://') ? new URL(sipServerUri).hostname : sipServerUri.split(':')[0]}`
     };
 
     try {
       await connectSip(newConfig);
-      // Connection status will be updated by SipContext and displayed via `connectionStatusText`
     } catch (error) {
       toast({
-        title: "SIP Connection Failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred.",
+        title: "Échec de la Connexion SIP",
+        description: error instanceof Error ? error.message : "Une erreur inconnue s'est produite.",
         variant: "destructive",
       });
     }
@@ -75,21 +74,21 @@ export default function SettingsPage() {
   const getConnectionStatusText = () => {
     switch (connectionStatus) {
       case 'disconnected':
-        return { text: "Disconnected", Icon: WifiOff, color: "text-red-500" };
+        return { text: "Déconnecté", Icon: WifiOff, color: "text-red-500" };
       case 'connecting':
-        return { text: "Connecting...", Icon: Wifi, color: "text-yellow-500 animate-pulse" };
+        return { text: "Connexion en cours...", Icon: Wifi, color: "text-yellow-500 animate-pulse" };
       case 'connected':
-        return { text: "Connected (Registering...)", Icon: Wifi, color: "text-blue-500" };
+        return { text: "Connecté (Enregistrement...)", Icon: Wifi, color: "text-blue-500" };
       case 'registered':
-        return { text: "Registered", Icon: Wifi, color: "text-green-500" };
+        return { text: "Enregistré", Icon: Wifi, color: "text-green-500" };
       case 'unregistered':
-        return { text: "Unregistered", Icon: WifiOff, color: "text-red-500" };
+        return { text: "Désenregistré", Icon: WifiOff, color: "text-red-500" };
       case 'registration_failed':
-        return { text: "Registration Failed", Icon: WifiOff, color: "text-red-600" };
+        return { text: "Échec de l'enregistrement", Icon: WifiOff, color: "text-red-600" };
       case 'error':
-        return { text: "Error", Icon: WifiOff, color: "text-destructive" };
+        return { text: "Erreur", Icon: WifiOff, color: "text-destructive" };
       default:
-        return { text: "Unknown", Icon: WifiOff, color: "text-muted-foreground" };
+        return { text: "Inconnu", Icon: WifiOff, color: "text-muted-foreground" };
     }
   };
 
@@ -97,65 +96,63 @@ export default function SettingsPage() {
   
   return (
     <div className="space-y-8">
-      <PageTitle>Settings</PageTitle>
+      <PageTitle>Paramètres</PageTitle>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Account Settings */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center"><User className="mr-2 text-primary" /> Account</CardTitle>
-            <CardDescription>Manage your VidApp Connect account details.</CardDescription>
+            <CardTitle className="flex items-center"><User className="mr-2 text-primary" /> Compte</CardTitle>
+            <CardDescription>Gérez les détails de votre compte VidApp Connect.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="displayName">Display Name</Label>
-              <Input id="displayName" defaultValue="Your Name" />
+              <Label htmlFor="displayName">Nom d'Affichage</Label>
+              <Input id="displayName" defaultValue="Votre Nom" />
             </div>
             <div>
-              <Label htmlFor="sipAddress">SIP Address (from server)</Label>
+              <Label htmlFor="sipAddress">Adresse SIP (du serveur)</Label>
               <Input id="sipAddress" defaultValue={currentSipConfig ? currentSipConfig.uri : "N/A"} disabled />
             </div>
              <a href="https://vidapp.com/account" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="w-full"><ExternalLink className="mr-2 h-4 w-4" /> Manage Account on vidapp.com</Button>
+              <Button variant="outline" className="w-full"><ExternalLink className="mr-2 h-4 w-4" /> Gérer le Compte sur vidapp.com</Button>
             </a>
-            <Button onClick={() => handleSaveChanges("Account")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <Save className="mr-2 h-4 w-4" /> Save Account Changes
+            <Button onClick={() => handleSaveChanges("Compte")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Save className="mr-2 h-4 w-4" /> Enregistrer les Modifications du Compte
             </Button>
           </CardContent>
         </Card>
 
-        {/* SIP Configuration Settings */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center"><PhoneCall className="mr-2 text-primary" /> SIP Configuration</CardTitle>
+            <CardTitle className="flex items-center"><PhoneCall className="mr-2 text-primary" /> Configuration SIP</CardTitle>
             <CardDescription className="flex items-center gap-2">
-              Status: <StatusIcon className={`mr-1 h-4 w-4 ${statusColor}`} /> <span className={statusColor}>{statusText}</span>
+              Statut : <StatusIcon className={`mr-1 h-4 w-4 ${statusColor}`} /> <span className={statusColor}>{statusText}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="sipUsername" className="flex items-center"><UserCheck className="mr-2 h-4 w-4 text-muted-foreground" />SIP Username</Label>
+              <Label htmlFor="sipUsername" className="flex items-center"><UserCheck className="mr-2 h-4 w-4 text-muted-foreground" />Nom d'utilisateur SIP</Label>
               <Input 
                 id="sipUsername" 
-                placeholder="e.g., 1001 or your_user" 
+                placeholder="ex: 1001 ou votre_utilisateur" 
                 value={sipUsername}
                 onChange={(e) => setSipUsername(e.target.value)}
                 disabled={connectionStatus === 'connecting' || connectionStatus === 'connected' || connectionStatus === 'registered'}
               />
             </div>
             <div>
-              <Label htmlFor="sipPassword" className="flex items-center"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" />SIP Password</Label>
+              <Label htmlFor="sipPassword" className="flex items-center"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" />Mot de passe SIP</Label>
               <Input 
                 id="sipPassword" 
                 type="password"
-                placeholder="Your SIP password" 
+                placeholder="Votre mot de passe SIP" 
                 value={sipPassword}
                 onChange={(e) => setSipPassword(e.target.value)}
                 disabled={connectionStatus === 'connecting' || connectionStatus === 'connected' || connectionStatus === 'registered'}
               />
             </div>
             <div>
-              <Label htmlFor="sipServerUri" className="flex items-center"><Server className="mr-2 h-4 w-4 text-muted-foreground" />SIP Server URI (WebSocket)</Label>
+              <Label htmlFor="sipServerUri" className="flex items-center"><Server className="mr-2 h-4 w-4 text-muted-foreground" />URI du Serveur SIP (WebSocket)</Label>
               <Input 
                 id="sipServerUri" 
                 placeholder="wss://asterisk.example.com:8089/ws" 
@@ -166,148 +163,143 @@ export default function SettingsPage() {
             </div>
             {connectionStatus === 'disconnected' || connectionStatus === 'error' || connectionStatus === 'unregistered' || connectionStatus === 'registration_failed' ? (
               <Button onClick={handleSaveSipConfig} className="w-full bg-green-600 hover:bg-green-700 text-white">
-                <LinkIcon className="mr-2 h-4 w-4" /> Connect & Register
+                <LinkIcon className="mr-2 h-4 w-4" /> Connecter & Enregistrer
               </Button>
             ) : (
               <Button onClick={handleDisconnectSip} className="w-full bg-red-600 hover:bg-red-700 text-white" variant="destructive">
-                <Unlink className="mr-2 h-4 w-4" /> Disconnect
+                <Unlink className="mr-2 h-4 w-4" /> Déconnecter
               </Button>
             )}
           </CardContent>
         </Card>
 
-        {/* Audio/Video Settings */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center"><Volume2 className="mr-2 text-primary" /> Audio & Video</CardTitle>
-            <CardDescription>Configure your microphone, speakers, and camera.</CardDescription>
+            <CardTitle className="flex items-center"><Volume2 className="mr-2 text-primary" /> Audio & Vidéo</CardTitle>
+            <CardDescription>Configurez votre microphone, haut-parleurs et caméra.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="micSelect" className="flex items-center"><Mic className="mr-2 h-4 w-4 text-muted-foreground" />Microphone</Label>
               <Select defaultValue="default">
                 <SelectTrigger id="micSelect">
-                  <SelectValue placeholder="Select Microphone" />
+                  <SelectValue placeholder="Sélectionner un Microphone" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="default">Default System Microphone</SelectItem>
-                  <SelectItem value="mic1">External USB Mic</SelectItem>
+                  <SelectItem value="default">Microphone Système par Défaut</SelectItem>
+                  <SelectItem value="mic1">Micro USB Externe</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="speakerSelect" className="flex items-center"><Volume2 className="mr-2 h-4 w-4 text-muted-foreground" />Speakers</Label>
+              <Label htmlFor="speakerSelect" className="flex items-center"><Volume2 className="mr-2 h-4 w-4 text-muted-foreground" />Haut-parleurs</Label>
               <Select defaultValue="default">
                 <SelectTrigger id="speakerSelect">
-                  <SelectValue placeholder="Select Speakers" />
+                  <SelectValue placeholder="Sélectionner des Haut-parleurs" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="default">Default System Speakers</SelectItem>
-                  <SelectItem value="speaker1">Headphones</SelectItem>
+                  <SelectItem value="default">Haut-parleurs Système par Défaut</SelectItem>
+                  <SelectItem value="speaker1">Écouteurs</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="cameraSelect" className="flex items-center"><Video className="mr-2 h-4 w-4 text-muted-foreground" />Camera</Label>
+              <Label htmlFor="cameraSelect" className="flex items-center"><Video className="mr-2 h-4 w-4 text-muted-foreground" />Caméra</Label>
               <Select defaultValue="default">
                 <SelectTrigger id="cameraSelect">
-                  <SelectValue placeholder="Select Camera" />
+                  <SelectValue placeholder="Sélectionner une Caméra" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="default">Default System Camera</SelectItem>
-                  <SelectItem value="cam1">Integrated Webcam</SelectItem>
+                  <SelectItem value="default">Caméra Système par Défaut</SelectItem>
+                  <SelectItem value="cam1">Webcam Intégrée</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => handleSaveChanges("Audio/Video")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <Save className="mr-2 h-4 w-4" /> Save Device Settings
+            <Button onClick={() => handleSaveChanges("Audio & Vidéo")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Save className="mr-2 h-4 w-4" /> Enregistrer les Paramètres des Périphériques
             </Button>
           </CardContent>
         </Card>
 
-        {/* Notifications Settings */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center"><Bell className="mr-2 text-primary" /> Notifications</CardTitle>
-            <CardDescription>Manage how you receive alerts from VidApp Connect.</CardDescription>
+            <CardDescription>Gérez la manière dont vous recevez les alertes de VidApp Connect.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <Label htmlFor="incomingCallNotifs" className="flex-grow flex items-center">
-                <BellRing className="mr-2 h-4 w-4 text-muted-foreground" /> Incoming Call Notifications
+                <BellRing className="mr-2 h-4 w-4 text-muted-foreground" /> Notifications d'Appel Entrant
               </Label>
               <Switch id="incomingCallNotifs" defaultChecked />
             </div>
             <div className="flex items-center justify-between">
               <Label htmlFor="missedCallNotifs" className="flex-grow flex items-center">
-                <BellMinus className="mr-2 h-4 w-4 text-muted-foreground" /> Missed Call Summaries
+                <BellMinus className="mr-2 h-4 w-4 text-muted-foreground" /> Résumés d'Appels Manqués
               </Label>
               <Switch id="missedCallNotifs" />
             </div>
             <div className="flex items-center justify-between">
               <Label htmlFor="soundNotifs" className="flex-grow flex items-center">
-                <Volume2 className="mr-2 h-4 w-4 text-muted-foreground" /> Notification Sounds
+                <Volume2 className="mr-2 h-4 w-4 text-muted-foreground" /> Sons des Notifications
               </Label>
               <Switch id="soundNotifs" defaultChecked />
             </div>
             <Button onClick={() => handleSaveChanges("Notifications")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <Save className="mr-2 h-4 w-4" /> Save Notification Preferences
+              <Save className="mr-2 h-4 w-4" /> Enregistrer les Préférences de Notification
             </Button>
           </CardContent>
         </Card>
 
-        {/* Privacy & Security Settings */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center"><Shield className="mr-2 text-primary" /> Privacy & Security</CardTitle>
-            <CardDescription>Control your privacy and app security.</CardDescription>
+            <CardTitle className="flex items-center"><Shield className="mr-2 text-primary" /> Confidentialité & Sécurité</CardTitle>
+            <CardDescription>Contrôlez votre confidentialité et la sécurité de l'application.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <Label htmlFor="blockUnknown" className="flex-grow flex items-center">
-                <ShieldAlert className="mr-2 h-4 w-4 text-muted-foreground" /> Block calls from unknown numbers
+                <ShieldAlert className="mr-2 h-4 w-4 text-muted-foreground" /> Bloquer les appels de numéros inconnus
               </Label>
               <Switch id="blockUnknown" />
             </div>
             <div>
                 <a href="https://vidapp.org/privacy" target="_blank" rel="noopener noreferrer">
-                    <Button variant="link" className="p-0 h-auto flex items-center"><ExternalLink className="mr-1 h-3 w-3" />View Privacy Policy on vidapp.org</Button>
+                    <Button variant="link" className="p-0 h-auto flex items-center"><ExternalLink className="mr-1 h-3 w-3" />Voir la Politique de Confidentialité sur vidapp.org</Button>
                 </a>
             </div>
-             <Button onClick={() => handleSaveChanges("Privacy")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                <Save className="mr-2 h-4 w-4" /> Save Privacy Settings
+             <Button onClick={() => handleSaveChanges("Confidentialité")} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                <Save className="mr-2 h-4 w-4" /> Enregistrer les Paramètres de Confidentialité
              </Button>
           </CardContent>
         </Card>
         
-        {/* About Section */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center"><Info className="mr-2 text-primary"/>About VidApp Connect</CardTitle>
+            <CardTitle className="flex items-center"><Info className="mr-2 text-primary"/>À Propos de VidApp Connect</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p className="flex items-center"><Info className="mr-2 h-4 w-4 text-muted-foreground" /> Version: 1.0.0 (Alpha)</p>
-            <p className="flex items-center"><Copyright className="mr-2 h-4 w-4 text-muted-foreground" /> &copy; {new Date().getFullYear()} VidApp. All rights reserved.</p>
-            <p className="flex items-center"><Cog className="mr-2 h-4 w-4 text-muted-foreground" /> Powered by SIP and Asterisk technologies.</p>
+            <p className="flex items-center"><Info className="mr-2 h-4 w-4 text-muted-foreground" /> Version : 1.0.0 (Alpha)</p>
+            <p className="flex items-center"><Copyright className="mr-2 h-4 w-4 text-muted-foreground" /> &copy; {new Date().getFullYear()} VidApp. Tous droits réservés.</p>
+            <p className="flex items-center"><Cog className="mr-2 h-4 w-4 text-muted-foreground" /> Propulsé par les technologies SIP et Asterisk.</p>
             <Separator className="my-3"/>
             <a href="https://vidapp.com/support" target="_blank" rel="noopener noreferrer" className="block">
-              <Button variant="outline" className="w-full"><LifeBuoy className="mr-2 h-4 w-4" />Get Support</Button>
+              <Button variant="outline" className="w-full"><LifeBuoy className="mr-2 h-4 w-4" />Obtenir de l'Aide</Button>
             </a>
              <a href="https://vidapp.org/terms" target="_blank" rel="noopener noreferrer" className="block mt-2">
-              <Button variant="outline" className="w-full"><FileText className="mr-2 h-4 w-4" />Terms of Service</Button>
+              <Button variant="outline" className="w-full"><FileText className="mr-2 h-4 w-4" />Conditions d'Utilisation</Button>
             </a>
           </CardContent>
         </Card>
 
-        {/* Logout */}
          <Card className="shadow-lg col-span-1 md:col-span-2 lg:col-span-1">
           <CardHeader>
-            <CardTitle className="flex items-center"><LogOut className="mr-2 text-destructive" /> Logout</CardTitle>
-            <CardDescription>Sign out of your VidApp Connect account.</CardDescription>
+            <CardTitle className="flex items-center"><LogOut className="mr-2 text-destructive" /> Déconnexion</CardTitle>
+            <CardDescription>Déconnectez-vous de votre compte VidApp Connect.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="destructive" className="w-full" onClick={() => toast({title: "Logged Out", description: "You have been successfully logged out. (Simulated)"})}>
-              <LogOut className="mr-2 h-4 w-4" /> Logout
+            <Button variant="destructive" className="w-full" onClick={() => toast({title: "Déconnecté", description: "Vous avez été déconnecté avec succès. (Simulé)"})}>
+              <LogOut className="mr-2 h-4 w-4" /> Déconnexion
             </Button>
           </CardContent>
         </Card>

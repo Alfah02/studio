@@ -25,7 +25,6 @@ export function DialPad({ onDial, disabled = false }: DialPadProps) {
   const handleDial = () => {
     if (number) {
       onDial(number);
-      // setNumber(''); // Optionally clear after dialing, or keep for redial
     }
   };
 
@@ -43,13 +42,13 @@ export function DialPad({ onDial, disabled = false }: DialPadProps) {
           type="text" 
           value={number} 
           onChange={(e) => setNumber(e.target.value)}
-          placeholder="Enter number or SIP URI" 
+          placeholder="Entrez numéro ou URI SIP" 
           className="text-center text-xl sm:text-2xl h-14 pr-10" 
-          aria-label="Dial number or SIP URI"
+          aria-label="Numéro à composer ou URI SIP"
           disabled={disabled}
         />
         {number && (
-          <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10" onClick={handleBackspace} aria-label="Backspace" disabled={disabled}>
+          <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10" onClick={handleBackspace} aria-label="Retour arrière" disabled={disabled}>
             <Delete className="h-5 w-5" />
           </Button>
         )}
@@ -72,7 +71,7 @@ export function DialPad({ onDial, disabled = false }: DialPadProps) {
         onClick={handleDial}
         disabled={!number || disabled}
       >
-        Dial
+        Appeler
       </Button>
     </div>
   );

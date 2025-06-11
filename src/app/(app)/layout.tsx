@@ -12,7 +12,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
         <footer className="py-6 text-center text-xs text-muted-foreground border-t">
-          © {new Date().getFullYear()} VidApp Connect. All rights reserved. For more information, visit <a href="https://vidapp.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-accent">vidapp.com</a> or <a href="https://vidapp.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-accent">vidapp.org</a>.
+          © {new Date().getFullYear()} VidApp Connect. Tous droits réservés. Pour plus d'informations, visitez <a href="https://vidapp.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-accent">vidapp.com</a> ou <a href="https://vidapp.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-accent">vidapp.org</a>.
         </footer>
       </div>
     </SipProvider>

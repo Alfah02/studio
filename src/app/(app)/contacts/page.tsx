@@ -8,14 +8,13 @@ import { ContactForm } from "@/components/custom/ContactForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-// import { dummyContacts } from "@/lib/data"; // Dummy data removed
 import type { Contact } from '@/lib/types';
 import { PlusCircle, Search, Star, Users, UsersRound, StarOff } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>([]); // Initialize with empty array
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,11 +23,11 @@ export default function ContactsPage() {
   const handleFormSubmit = (data: Omit<Contact, 'id' | 'isFavorite'>) => {
     if (editingContact) {
       setContacts(prev => prev.map(c => c.id === editingContact.id ? { ...editingContact, ...data } : c));
-      toast({ title: "Contact Updated", description: `${data.name} has been updated.` });
+      toast({ title: "Contact Mis à Jour", description: `${data.name} a été mis à jour.` });
     } else {
       const newContact: Contact = { ...data, id: Date.now().toString(), isFavorite: false };
       setContacts(prev => [newContact, ...prev]);
-      toast({ title: "Contact Added", description: `${data.name} has been added.` });
+      toast({ title: "Contact Ajouté", description: `${data.name} a été ajouté.` });
     }
     setIsFormOpen(false);
     setEditingContact(undefined);
@@ -43,17 +42,15 @@ export default function ContactsPage() {
     const contactToDelete = contacts.find(c => c.id === contactId);
     setContacts(prev => prev.filter(c => c.id !== contactId));
     if (contactToDelete) {
-      toast({ title: "Contact Deleted", description: `${contactToDelete.name} has been deleted.`, variant: "destructive" });
+      toast({ title: "Contact Supprimé", description: `${contactToDelete.name} a été supprimé.`, variant: "destructive" });
     }
   };
   
   const handleCall = (contact: Contact, type: 'audio' | 'video') => {
     toast({
-      title: `Starting ${type} call...`,
-      description: `Calling ${contact.name} (${contact.number})`,
+      title: `Démarrage de l'appel ${type}...`,
+      description: `Appel de ${contact.name} (${contact.number})`,
     });
-    // In a real app, you'd initiate the call here using SipContext.
-    // Potentially redirect to calls page or open a call modal.
   };
 
   const handleToggleFavorite = (contactId: string) => {
@@ -64,7 +61,7 @@ export default function ContactsPage() {
     );
     const contact = contacts.find(c => c.id === contactId);
     if (contact) {
-      toast({ title: contact.isFavorite ? "Removed from Favorites" : "Added to Favorites", description: `${contact.name} is ${contact.isFavorite ? 'no longer a' : 'now a'} favorite.` });
+      toast({ title: contact.isFavorite ? "Retiré des Favoris" : "Ajouté aux Favoris", description: `${contact.name} ${contact.isFavorite ? "n'est plus un" : 'est maintenant un'} favori.` });
     }
   };
 
@@ -90,7 +87,7 @@ export default function ContactsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input 
               type="search" 
-              placeholder="Search contacts..." 
+              placeholder="Rechercher des contacts..." 
               className="pl-10 w-full sm:w-64"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -99,7 +96,7 @@ export default function ContactsPage() {
           <Dialog open={isFormOpen} onOpenChange={ (open) => { setIsFormOpen(open); if(!open) setEditingContact(undefined); }}>
             <DialogTrigger asChild>
               <Button onClick={() => { setEditingContact(undefined); setIsFormOpen(true); }} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                <PlusCircle className="mr-2 h-5 w-5" /> Add Contact
+                <PlusCircle className="mr-2 h-5 w-5" /> Ajouter un Contact
               </Button>
             </DialogTrigger>
             {isFormOpen && <ContactForm onSubmit={handleFormSubmit} initialData={editingContact} onClose={() => { setIsFormOpen(false); setEditingContact(undefined); }} />}
@@ -109,8 +106,8 @@ export default function ContactsPage() {
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:w-auto sm:inline-flex mb-4">
-          <TabsTrigger value="all" className="flex items-center gap-2"><Users className="h-4 w-4" /> All Contacts ({allContactsSorted.length})</TabsTrigger>
-          <TabsTrigger value="favorites" className="flex items-center gap-2"><Star className="h-4 w-4" /> Favorites ({favoriteContacts.length})</TabsTrigger>
+          <TabsTrigger value="all" className="flex items-center gap-2"><Users className="h-4 w-4" /> Tous les Contacts ({allContactsSorted.length})</TabsTrigger>
+          <TabsTrigger value="favorites" className="flex items-center gap-2"><Star className="h-4 w-4" /> Favoris ({favoriteContacts.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="all">
           {allContactsSorted.length > 0 ? (
@@ -129,9 +126,9 @@ export default function ContactsPage() {
           ) : (
             <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
               <UsersRound size={48} />
-              <p>No contacts available.</p>
-              <p className="text-sm">In a production system, contacts would typically be synchronized from a central server.</p>
-              <p className="text-sm">You can add contacts locally using the 'Add Contact' button.</p>
+              <p>Aucun contact disponible.</p>
+              <p className="text-sm">Dans un système de production, les contacts seraient typiquement synchronisés depuis un serveur central.</p>
+              <p className="text-sm">Vous pouvez ajouter des contacts localement en utilisant le bouton 'Ajouter un Contact'.</p>
             </div>
           )}
         </TabsContent>
@@ -152,8 +149,8 @@ export default function ContactsPage() {
           ) : (
              <div className="text-muted-foreground text-center py-8 flex flex-col items-center gap-2">
               <StarOff size={48} />
-              <p>No favorite contacts yet.</p>
-              <p className="text-sm">Mark some contacts as favorites, and they will appear here.</p>
+              <p>Aucun contact favori pour le moment.</p>
+              <p className="text-sm">Marquez des contacts comme favoris, et ils apparaîtront ici.</p>
             </div>
           )}
         </TabsContent>

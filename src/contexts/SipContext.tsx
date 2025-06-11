@@ -31,8 +31,8 @@ interface SipContextValue extends SipContextState {
   makeCall: (target: string) => Promise<void>;
   answerCall: () => Promise<void>;
   hangupCall: () => void;
-  toggleMute: () => boolean; // Returns new mute state
-  toggleVideo: () => boolean; // Returns new video state
+  toggleMute: () => boolean; 
+  toggleVideo: () => boolean; 
   isMuted: boolean;
   isVideoEnabled: boolean;
   requestCameraPermission: () => Promise<void>;
@@ -55,7 +55,7 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
 
   const requestCameraPermission = useCallback(async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      toast({ title: 'Camera Error', description: 'getUserMedia not supported in this browser.', variant: 'destructive' });
+      toast({ title: 'Erreur Caméra', description: "getUserMedia n'est pas supporté par ce navigateur.", variant: 'destructive' });
       setHasCameraPermission(false);
       return;
     }
@@ -63,10 +63,8 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       setLocalStream(stream);
       setHasCameraPermission(true);
-      // Ensure video is enabled by default if permission is granted
       stream.getVideoTracks().forEach(track => track.enabled = true);
       setIsVideoEnabled(true);
-      // Ensure audio is enabled by default
       stream.getAudioTracks().forEach(track => track.enabled = true);
       setIsMuted(false);
     } catch (error) {
@@ -74,8 +72,8 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       setHasCameraPermission(false);
       toast({
         variant: 'destructive',
-        title: 'Device Access Denied',
-        description: 'Please enable camera and microphone permissions in your browser settings.',
+        title: 'Accès aux Périphériques Refusé',
+        description: 'Veuillez activer les permissions pour la caméra et le microphone dans les paramètres de votre navigateur.',
       });
     }
   }, [toast]);
@@ -83,26 +81,26 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
 
   const setupSessionEventHandlers = useCallback((session: JsSIP.RTCSession) => {
     const callId = session.id;
-    const remoteIdentity = session.remote_identity?.uri.toString() || 'Unknown';
+    const remoteIdentity = session.remote_identity?.uri.toString() || 'Inconnu';
 
     session.on('progress', () => {
       setActiveCall(prev => prev && prev.id === callId ? { ...prev, status: 'progress' } : prev);
-      toast({ title: "Call Progress", description: `Calling ${remoteIdentity}...` });
+      toast({ title: "Appel en Cours", description: `Appel de ${remoteIdentity}...` });
     });
 
     session.on('accepted', () => {
       setActiveCall(prev => prev && prev.id === callId ? { ...prev, status: 'answered', localStream } : prev);
-      toast({ title: "Call Accepted", description: `Call with ${remoteIdentity} started.` });
+      toast({ title: "Appel Accepté", description: `L'appel avec ${remoteIdentity} a commencé.` });
     });
 
     session.on('ended', () => {
-      toast({ title: "Call Ended", description: `Call with ${remoteIdentity} has ended.` });
+      toast({ title: "Appel Terminé", description: `L'appel avec ${remoteIdentity} est terminé.` });
       setActiveCall(null);
       setRemoteStream(null);
     });
 
     session.on('failed', (e: any) => { 
-      toast({ title: "Call Failed", description: `Call with ${remoteIdentity} failed. ${e?.cause ? `Cause: ${e.cause}` : ''}`, variant: "destructive" });
+      toast({ title: "Échec de l'Appel", description: `L'appel avec ${remoteIdentity} a échoué. ${e?.cause ? `Cause : ${e.cause}` : ''}`, variant: "destructive" });
       setActiveCall(null);
       setRemoteStream(null);
     });
@@ -122,23 +120,23 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
     newUserAgent.on('connecting', () => setConnectionStatus('connecting'));
     newUserAgent.on('connected', () => {
         setConnectionStatus('connected');
-        toast({ title: 'SIP Status', description: 'Connected to WebSocket. Registering...' });
+        toast({ title: 'Statut SIP', description: 'Connecté au WebSocket. Enregistrement en cours...' });
     });
     newUserAgent.on('disconnected', () => {
         setConnectionStatus('disconnected');
-        toast({ title: 'SIP Status', description: 'Disconnected from SIP server.', variant: 'destructive' });
+        toast({ title: 'Statut SIP', description: 'Déconnecté du serveur SIP.', variant: 'destructive' });
     });
     newUserAgent.on('registered', () => {
         setConnectionStatus('registered');
-        toast({ title: 'SIP Status', description: 'Successfully registered.', variant: 'default' });
+        toast({ title: 'Statut SIP', description: 'Enregistrement réussi.', variant: 'default' });
     });
     newUserAgent.on('unregistered', (e) => {
         setConnectionStatus('unregistered');
-        toast({ title: 'SIP Status', description: `Unregistered. ${e?.cause || ''}`, variant: 'destructive' });
+        toast({ title: 'Statut SIP', description: `Désenregistré. ${e?.cause || ''}`, variant: 'destructive' });
     });
     newUserAgent.on('registrationFailed', (e) => {
         setConnectionStatus('registration_failed');
-        toast({ title: 'SIP Status', description: `Registration failed. ${e?.cause || ''}`, variant: 'destructive' });
+        toast({ title: 'Statut SIP', description: `Échec de l'enregistrement. ${e?.cause || ''}`, variant: 'destructive' });
     });
 
     newUserAgent.on('newRTCSession', (data: JsSIP.UserAgentNewRtcSessionEvent) => {
@@ -149,7 +147,7 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
         id: session.id,
         session: session,
         direction: session.direction as 'incoming' | 'outgoing',
-        remoteIdentity: session.remote_identity?.uri.toString() || 'Unknown',
+        remoteIdentity: session.remote_identity?.uri.toString() || 'Inconnu',
         status: session.direction === 'incoming' ? 'ringing' : 'initiating',
         localStream: session.direction === 'outgoing' ? localStream : undefined,
       };
@@ -158,8 +156,8 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
 
       if (session.direction === 'incoming') {
         toast({ 
-            title: "Incoming Call", 
-            description: `Call from ${callData.remoteIdentity}. Go to Calls page to answer.`,
+            title: "Appel Entrant", 
+            description: `Appel de ${callData.remoteIdentity}. Allez à la page Appels pour répondre.`,
             duration: 15000 
         });
       }
@@ -169,7 +167,7 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
 
   const connectSip = useCallback(async (config: SipConfig) => {
     if (!JsSIPInstance) {
-      toast({ title: "Error", description: "JsSIP library not loaded.", variant: "destructive"});
+      toast({ title: "Erreur", description: "La librairie JsSIP n'est pas chargée.", variant: "destructive"});
       setConnectionStatus("error");
       return;
     }
@@ -200,7 +198,7 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("SIP Connection Error:", error);
       setConnectionStatus("error");
-      toast({ title: "SIP Error", description: `Failed to initialize SIP client: ${error instanceof Error ? error.message : String(error)}`, variant: "destructive" });
+      toast({ title: "Erreur SIP", description: `Échec de l'initialisation du client SIP : ${error instanceof Error ? error.message : String(error)}`, variant: "destructive" });
     }
   }, [ua, toast, handleConnectionEvents]);
 
@@ -217,23 +215,23 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       setLocalStream(null);
       setRemoteStream(null);
       setHasCameraPermission(null);
-      toast({ title: "SIP Status", description: "Disconnected." });
+      toast({ title: "Statut SIP", description: "Déconnecté." });
     }
   }, [ua, toast, localStream]);
 
   const makeCall = useCallback(async (target: string) => {
     if (!ua || connectionStatus !== 'registered' || !sipConfig) {
-      toast({ title: "Call Error", description: "Not registered or SIP config missing.", variant: "destructive"});
+      toast({ title: "Erreur d'Appel", description: "Non enregistré ou configuration SIP manquante.", variant: "destructive"});
       return;
     }
     if (!localStream) { 
-      toast({ title: "Media Required", description: "Camera/microphone access is needed. Please grant permission and try again.", variant: "destructive"});
+      toast({ title: "Média Requis", description: "L'accès à la caméra/microphone est nécessaire. Veuillez accorder la permission et réessayer.", variant: "destructive"});
       await requestCameraPermission(); 
-      return; 
+      if (!localStream) return; // Re-check after attempting to get permission
     }
 
     const callOptions: JsSIP.UACommonOptions = {
-      mediaConstraints: { audio: true, video: isVideoEnabled }, // Use isVideoEnabled state
+      mediaConstraints: { audio: true, video: isVideoEnabled },
       pcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }, 
       rtcOfferConstraints: {
           offerToReceiveAudio: true,
@@ -262,21 +260,21 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
             }
         }
     } catch (e) {
-        toast({ title: "Call Error", description: `Failed to initiate call: ${e}`, variant: "destructive" });
+        toast({ title: "Erreur d'Appel", description: `Échec de l'initiation de l'appel : ${e}`, variant: "destructive" });
     }
-  }, [ua, connectionStatus, sipConfig, toast, localStream, setupSessionEventHandlers, requestCameraPermission, isVideoEnabled, isMuted]);
+  }, [ua, connectionStatus, sipConfig, toast, localStream, setupSessionEventHandlers, requestCameraPermission, isVideoEnabled]);
 
 
   const answerCall = useCallback(async () => {
     if (activeCall && activeCall.session && activeCall.direction === 'incoming') {
       if (!localStream) {
-        toast({title: "Media Required", description: "Camera/microphone access is needed to answer. Please grant permission and try again.", variant: "destructive"});
+        toast({title: "Média Requis", description: "L'accès à la caméra/microphone est nécessaire pour répondre. Veuillez accorder la permission et réessayer.", variant: "destructive"});
         await requestCameraPermission();
-        return; 
+        if(!localStream) return; // Re-check
       }
       
       activeCall.session.answer({
-        mediaConstraints: { audio: true, video: isVideoEnabled }, // Use isVideoEnabled state
+        mediaConstraints: { audio: true, video: isVideoEnabled },
         pcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
         extraHeaders: [], 
         rtcOfferConstraints: {
@@ -292,9 +290,9 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
        }
        setActiveCall(prev => prev ? {...prev, status: 'answered', localStream } : null);
     } else {
-         toast({title: "Answer Error", description: "No incoming call to answer.", variant: "destructive"});
+         toast({title: "Erreur de Réponse", description: "Aucun appel entrant à répondre.", variant: "destructive"});
     }
-  }, [activeCall, localStream, requestCameraPermission, toast, isVideoEnabled, isMuted]);
+  }, [activeCall, localStream, requestCameraPermission, toast, isVideoEnabled]);
   
   const hangupCall = useCallback(() => {
     if (activeCall && activeCall.session) {
@@ -311,7 +309,7 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       const audioTracks = localStream.getAudioTracks();
       if (audioTracks.length > 0) {
         const newIsMuted = !isMuted;
-        audioTracks.forEach(track => track.enabled = !newIsMuted); // If newIsMuted is true (muted), track.enabled becomes false.
+        audioTracks.forEach(track => track.enabled = !newIsMuted);
         setIsMuted(newIsMuted);
         
         if (activeCall?.session) {
@@ -332,7 +330,7 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       const videoTracks = localStream.getVideoTracks();
       if (videoTracks.length > 0) {
         const newIsVideoEnabled = !isVideoEnabled;
-        videoTracks.forEach(track => track.enabled = newIsVideoEnabled); // If newIsVideoEnabled is true (video on), track.enabled becomes true.
+        videoTracks.forEach(track => track.enabled = newIsVideoEnabled);
         setIsVideoEnabled(newIsVideoEnabled);
         
         if (activeCall?.session) {
@@ -380,5 +378,3 @@ export const useSip = (): SipContextValue => {
   }
   return context;
 };
-
-    

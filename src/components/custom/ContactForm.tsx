@@ -17,10 +17,10 @@ import type { Contact } from "@/lib/types";
 import { DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 
 const contactFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  number: z.string().min(5, "Phone number seems too short.").regex(/^\+?[0-9\s\-()]+$/, "Invalid phone number format."),
-  email: z.string().email("Invalid email address.").optional().or(z.literal('')),
-  avatarUrl: z.string().url("Invalid URL format.").optional().or(z.literal('')),
+  name: z.string().min(2, "Le nom doit comporter au moins 2 caractères."),
+  number: z.string().min(5, "Le numéro de téléphone semble trop court.").regex(/^\+?[0-9\s\-()]+$/, "Format du numéro de téléphone invalide."),
+  email: z.string().email("Adresse email invalide.").optional().or(z.literal('')),
+  avatarUrl: z.string().url("Format d'URL invalide.").optional().or(z.literal('')),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -50,7 +50,7 @@ export function ContactForm({ onSubmit, initialData, onClose }: ContactFormProps
   return (
     <DialogContent className="sm:max-w-[425px] bg-card">
       <DialogHeader>
-        <DialogTitle>{initialData?.id ? "Edit Contact" : "Add New Contact"}</DialogTitle>
+        <DialogTitle>{initialData?.id ? "Modifier le Contact" : "Ajouter un Nouveau Contact"}</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 py-4">
@@ -59,9 +59,9 @@ export function ContactForm({ onSubmit, initialData, onClose }: ContactFormProps
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Nom</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input placeholder="Jean Dupont" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -72,7 +72,7 @@ export function ContactForm({ onSubmit, initialData, onClose }: ContactFormProps
             name="number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel>Numéro de Téléphone</FormLabel>
                 <FormControl>
                   <Input placeholder="+1-555-123-4567" {...field} />
                 </FormControl>
@@ -85,9 +85,9 @@ export function ContactForm({ onSubmit, initialData, onClose }: ContactFormProps
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email (Optional)</FormLabel>
+                <FormLabel>Email (Optionnel)</FormLabel>
                 <FormControl>
-                  <Input placeholder="john.doe@example.com" {...field} />
+                  <Input placeholder="jean.dupont@example.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -98,7 +98,7 @@ export function ContactForm({ onSubmit, initialData, onClose }: ContactFormProps
             name="avatarUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Avatar URL (Optional)</FormLabel>
+                <FormLabel>URL de l'Avatar (Optionnel)</FormLabel>
                 <FormControl>
                   <Input placeholder="https://example.com/avatar.png" {...field} />
                 </FormControl>
@@ -109,11 +109,11 @@ export function ContactForm({ onSubmit, initialData, onClose }: ContactFormProps
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Annuler
               </Button>
             </DialogClose>
             <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              {initialData?.id ? "Save Changes" : "Add Contact"}
+              {initialData?.id ? "Enregistrer les Modifications" : "Ajouter le Contact"}
             </Button>
           </DialogFooter>
         </form>

@@ -28,8 +28,8 @@ interface SipContextState {
 interface SipContextValue extends SipContextState {
   connectSip: (config: SipConfig) => Promise<void>;
   disconnectSip: () => void;
-  makeCall: (target: string) => void;
-  answerCall: () => void;
+  makeCall: (target: string) => Promise<void>;
+  answerCall: () => Promise<void>;
   hangupCall: () => void;
   toggleMute: () => boolean; // Returns new mute state
   toggleVideo: () => boolean; // Returns new video state
@@ -66,6 +66,9 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       // Ensure video is enabled by default if permission is granted
       stream.getVideoTracks().forEach(track => track.enabled = true);
       setIsVideoEnabled(true);
+      // Ensure audio is enabled by default
+      stream.getAudioTracks().forEach(track => track.enabled = true);
+      setIsMuted(false);
     } catch (error) {
       console.error('Error accessing camera/mic:', error);
       setHasCameraPermission(false);
@@ -96,17 +99,15 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       toast({ title: "Call Ended", description: `Call with ${remoteIdentity} has ended.` });
       setActiveCall(null);
       setRemoteStream(null);
-      // Don't stop local stream here, user might want to start another call
     });
 
-    session.on('failed', (e: any) => { // Use any for JsSIP event data if specific type is unknown
+    session.on('failed', (e: any) => { 
       toast({ title: "Call Failed", description: `Call with ${remoteIdentity} failed. ${e?.cause ? `Cause: ${e.cause}` : ''}`, variant: "destructive" });
       setActiveCall(null);
       setRemoteStream(null);
     });
     
-    // Handle media streams
-    if (session.connection) { // RTCPeerConnection
+    if (session.connection) { 
       session.connection.ontrack = (event: RTCTrackEvent) => {
         if (event.streams && event.streams[0]) {
           setRemoteStream(event.streams[0]);
@@ -114,15 +115,6 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
         }
       };
     }
-    // For outgoing calls, add local stream tracks
-    if (session.direction === 'outgoing' && localStream) {
-        localStream.getTracks().forEach(track => {
-            if (session.connection) {
-                session.connection.addTrack(track, localStream);
-            }
-        });
-    }
-
   }, [toast, localStream]);
 
 
@@ -168,7 +160,7 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
         toast({ 
             title: "Incoming Call", 
             description: `Call from ${callData.remoteIdentity}. Go to Calls page to answer.`,
-            duration: 15000 // Longer duration for incoming call toast
+            duration: 15000 
         });
       }
     });
@@ -194,8 +186,8 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
         password: config.password,
         display_name: config.username,
         register: true,
-        session_timers: false, // Disabling session timers can sometimes help with compatibility
-        registrar_server: undefined, // Usually not needed if uri domain matches server
+        session_timers: false, 
+        registrar_server: undefined, 
         contact_uri: undefined,
         authorization_user: config.username,
         no_answer_timeout: 60,
@@ -219,23 +211,30 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
       setConnectionStatus('disconnected');
       setSipConfig(null);
       setActiveCall(null);
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
       setLocalStream(null);
       setRemoteStream(null);
       setHasCameraPermission(null);
       toast({ title: "SIP Status", description: "Disconnected." });
     }
-  }, [ua, toast]);
+  }, [ua, toast, localStream]);
 
   const makeCall = useCallback(async (target: string) => {
-    if (!ua || connectionStatus !== 'registered' || !sipConfig || !localStream) {
-      toast({ title: "Call Error", description: "Not registered, SIP config missing, or no local media.", variant: "destructive"});
-      if(!localStream) await requestCameraPermission(); // Try to get permission if missing
+    if (!ua || connectionStatus !== 'registered' || !sipConfig) {
+      toast({ title: "Call Error", description: "Not registered or SIP config missing.", variant: "destructive"});
       return;
+    }
+    if (!localStream) { 
+      toast({ title: "Media Required", description: "Camera/microphone access is needed. Please grant permission and try again.", variant: "destructive"});
+      await requestCameraPermission(); 
+      return; 
     }
 
     const callOptions: JsSIP.UACommonOptions = {
-      mediaConstraints: { audio: true, video: true },
-      pcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }, // Example STUN server
+      mediaConstraints: { audio: true, video: isVideoEnabled }, // Use isVideoEnabled state
+      pcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }, 
       rtcOfferConstraints: {
           offerToReceiveAudio: true,
           offerToReceiveVideo: true
@@ -256,7 +255,6 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
             setActiveCall(callData);
             setupSessionEventHandlers(session);
 
-            // Add local tracks to the session's peer connection
             if (localStream && session.connection) {
                 localStream.getTracks().forEach(track => {
                     session.connection.addTrack(track, localStream);
@@ -266,22 +264,27 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
     } catch (e) {
         toast({ title: "Call Error", description: `Failed to initiate call: ${e}`, variant: "destructive" });
     }
-  }, [ua, connectionStatus, sipConfig, toast, localStream, setupSessionEventHandlers, requestCameraPermission]);
+  }, [ua, connectionStatus, sipConfig, toast, localStream, setupSessionEventHandlers, requestCameraPermission, isVideoEnabled, isMuted]);
 
 
-  const answerCall = useCallback(() => {
-    if (activeCall && activeCall.session && activeCall.direction === 'incoming' && localStream) {
+  const answerCall = useCallback(async () => {
+    if (activeCall && activeCall.session && activeCall.direction === 'incoming') {
+      if (!localStream) {
+        toast({title: "Media Required", description: "Camera/microphone access is needed to answer. Please grant permission and try again.", variant: "destructive"});
+        await requestCameraPermission();
+        return; 
+      }
+      
       activeCall.session.answer({
-        mediaConstraints: { audio: true, video: true },
+        mediaConstraints: { audio: true, video: isVideoEnabled }, // Use isVideoEnabled state
         pcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
-         // Add local tracks to the session's peer connection
-        extraHeaders: [], // Add any extra headers if needed
+        extraHeaders: [], 
         rtcOfferConstraints: {
             offerToReceiveAudio: true,
             offerToReceiveVideo: true
         },
       });
-      // Add local tracks after answering
+
        if (localStream && activeCall.session.connection) {
            localStream.getTracks().forEach(track => {
                activeCall.session.connection.addTrack(track, localStream);
@@ -289,10 +292,9 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
        }
        setActiveCall(prev => prev ? {...prev, status: 'answered', localStream } : null);
     } else {
-         if(!localStream) requestCameraPermission();
-         toast({title: "Answer Error", description: "No incoming call or local media stream not ready.", variant: "destructive"});
+         toast({title: "Answer Error", description: "No incoming call to answer.", variant: "destructive"});
     }
-  }, [activeCall, localStream, requestCameraPermission, toast]);
+  }, [activeCall, localStream, requestCameraPermission, toast, isVideoEnabled, isMuted]);
   
   const hangupCall = useCallback(() => {
     if (activeCall && activeCall.session) {
@@ -308,30 +310,46 @@ export const SipProvider = ({ children }: { children: ReactNode }) => {
     if (localStream) {
       const audioTracks = localStream.getAudioTracks();
       if (audioTracks.length > 0) {
-        const newMutedState = !audioTracks[0].enabled;
-        audioTracks[0].enabled = !newMutedState; // This seems reversed, should be audioTracks[0].enabled = newMutedState ? false : true;
-        setIsMuted(newMutedState);
-        return newMutedState;
+        const newIsMuted = !isMuted;
+        audioTracks.forEach(track => track.enabled = !newIsMuted); // If newIsMuted is true (muted), track.enabled becomes false.
+        setIsMuted(newIsMuted);
+        
+        if (activeCall?.session) {
+          if (newIsMuted) {
+            activeCall.session.mute({audio: true});
+          } else {
+            activeCall.session.unmute({audio: true});
+          }
+        }
+        return newIsMuted;
       }
     }
     return isMuted;
-  }, [localStream, isMuted]);
+  }, [localStream, activeCall, isMuted]);
 
   const toggleVideo = useCallback(() => {
     if (localStream) {
       const videoTracks = localStream.getVideoTracks();
       if (videoTracks.length > 0) {
-        const newVideoState = !videoTracks[0].enabled;
-        videoTracks[0].enabled = newVideoState; // Correct logic: enable if newVideoState is true
-        setIsVideoEnabled(newVideoState); 
-        return newVideoState;
+        const newIsVideoEnabled = !isVideoEnabled;
+        videoTracks.forEach(track => track.enabled = newIsVideoEnabled); // If newIsVideoEnabled is true (video on), track.enabled becomes true.
+        setIsVideoEnabled(newIsVideoEnabled);
+        
+        if (activeCall?.session) {
+          if (!newIsVideoEnabled) { 
+            activeCall.session.mute({video: true});
+          } else { 
+            activeCall.session.unmute({video: true});
+          }
+        }
+        return newIsVideoEnabled;
       }
     }
     return isVideoEnabled;
-  }, [localStream, isVideoEnabled]);
+  }, [localStream, activeCall, isVideoEnabled]);
 
 
-  useEffect(() => { // Cleanup local stream on unmount or when disconnecting
+  useEffect(() => { 
     return () => {
       if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
@@ -362,3 +380,5 @@ export const useSip = (): SipContextValue => {
   }
   return context;
 };
+
+    

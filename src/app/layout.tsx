@@ -9,7 +9,12 @@ export const metadata: Metadata = {
   title: 'VidApp Connect',
   description: 'Appels audio et vidéo de haute qualité par VidApp',
   icons: {
-    icon: '/vidapp-tab-logo.png', // Cela pointera vers public/vidapp-tab-logo.png
+    icon: '/vidapp-tab-logo.png', // Favicon standard
+    shortcut: '/vidapp-tab-logo.png', // Pour les anciens navigateurs
+    apple: '/apple-vidapp-icon.png', // Pour les appareils Apple (par ex. écran d'accueil)
+    // Vous pouvez ajouter d'autres tailles ou types ici si nécessaire, par exemple :
+    // { rel: 'icon', url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    // { rel: 'icon', url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
   },
 };
 

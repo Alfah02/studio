@@ -1,4 +1,3 @@
-
 // No "use client" here, this is a Server Component
 
 import type {Metadata} from 'next';
@@ -9,6 +8,9 @@ import { AppClientProviders } from './providers'; // Import the new client provi
 export const metadata: Metadata = {
   title: 'VidApp Connect',
   description: 'Appels audio et vidéo de haute qualité par VidApp',
+  icons: {
+    icon: '/vidapp-tab-logo.png', // Cela pointera vers public/vidapp-tab-logo.png
+  },
 };
 
 export default function RootLayout({
